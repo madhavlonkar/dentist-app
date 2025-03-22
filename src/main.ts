@@ -6,6 +6,12 @@ import { ResponseInterceptor } from './interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
+  // Enable CORS explicitly allowing all origins and HTTP methods
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  });
 
   // Start Server
   app.useGlobalInterceptors(new ResponseInterceptor());
@@ -14,3 +20,4 @@ async function bootstrap() {
 }
 
 bootstrap();
+

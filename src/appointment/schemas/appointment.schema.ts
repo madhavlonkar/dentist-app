@@ -1,25 +1,28 @@
 // src/appointment/schemas/appointment.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export type AppointmentDocument = Appointment & Document;
 
 @Schema({ timestamps: true })
 export class Appointment {
-  @Prop({ type: Types.ObjectId, ref: 'Patient', required: true })
-  patientId: Types.ObjectId;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Patient', required: true })
+  patient_id: MongooseSchema.Types.ObjectId;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch', required: true })
+  branch_id: MongooseSchema.Types.ObjectId;
 
   @Prop({ required: true })
-  date: Date;
+  start_time: Date;
 
   @Prop({ required: true })
-  time: string;
+  end_time: Date;
 
-  @Prop({ default: 'General Checkup' })
-  reason: string;
-
-  @Prop({ default: 'Scheduled' })
+  @Prop({ enum: ['UPCOMING', 'COMPLETED', 'CANCELLED'], default: 'UPCOMING' })
   status: string;
+
+  @Prop()
+  notes: string;
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);

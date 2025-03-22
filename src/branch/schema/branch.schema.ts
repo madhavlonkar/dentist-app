@@ -1,26 +1,19 @@
-// src/patient/schemas/patient.schema.ts
+// src/branch/schemas/branch.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type PatientDocument = Patient & Document;
+export type BranchDocument = Branch & Document;
 
 @Schema({ timestamps: true })
-export class Patient {
+export class Branch {
   @Prop({ required: true })
   name: string;
 
   @Prop({ required: true })
-  dob: Date;
-
-  @Prop()
   address: string;
 
   @Prop({ required: true })
   phone_no: string;
-
-  @Prop()
-  email?: string;
-
 }
 
-export const PatientSchema = SchemaFactory.createForClass(Patient);
+export const BranchSchema = SchemaFactory.createForClass(Branch);

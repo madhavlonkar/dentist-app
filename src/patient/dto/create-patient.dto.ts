@@ -1,21 +1,20 @@
 // src/patient/dto/create-patient.dto.ts
-import { IsString, IsNumber, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsDateString, IsOptional, IsNumber } from 'class-validator';
 
 export class CreatePatientDto {
   @IsString()
   name: string;
 
-  @IsNumber()
-  age: number;
+  @IsDateString()
+  dob: string;
 
   @IsString()
-  phone: string;
+  address?: string;
+
+  @IsString()
+  phone_no: string;
 
   @IsOptional()
   @IsString()
   email?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
 }

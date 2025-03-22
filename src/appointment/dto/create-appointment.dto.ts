@@ -1,21 +1,22 @@
 // src/appointment/dto/create-appointment.dto.ts
-import { IsString, IsDateString, IsOptional } from 'class-validator';
+import { IsString, IsDateString, IsEnum } from 'class-validator';
 
 export class CreateAppointmentDto {
   @IsString()
-  patientId: string;
+  patient_id: string;
+
+  @IsString()
+  branch_id: string;
 
   @IsDateString()
-  date: Date;
+  start_time: string;
+
+  @IsDateString()
+  end_time: string;
+
+  @IsEnum(['UPCOMING', 'COMPLETED', 'CANCELLED'])
+  status: 'UPCOMING' | 'COMPLETED' | 'CANCELLED';
 
   @IsString()
-  time: string;
-
-  @IsOptional()
-  @IsString()
-  reason?: string;
-
-  @IsOptional()
-  @IsString()
-  status?: string;
+  notes: string;
 }

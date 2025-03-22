@@ -7,6 +7,7 @@ import {
     Patch,
     Param,
     Delete,
+    Query,
   } from '@nestjs/common';
   import { AppointmentService } from './appointment.service';
   import { CreateAppointmentDto } from './dto/create-appointment.dto';
@@ -22,8 +23,8 @@ import {
     }
   
     @Get()
-    findAll() {
-      return this.appointmentService.findAll();
+    findAll(@Query('date') date: string) {
+      return this.appointmentService.findAll(date);
     }
   
     @Get(':id')

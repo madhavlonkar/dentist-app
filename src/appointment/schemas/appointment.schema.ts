@@ -16,7 +16,7 @@ export class Appointment {
   start_time: Date;
 
   @Prop({ required: true })
-  appoitment_reason: Date;
+  appoitment_reason: string;
 
   @Prop({ required: true })
   end_time: Date;

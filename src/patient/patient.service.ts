@@ -46,8 +46,8 @@ export class PatientService {
         ? {
           $or: [
             { name: { $regex: search, $options: 'i' } },
-            { email: { $regex: search, $options: 'i' } },
             { phone_no: { $regex: search, $options: 'i' } },
+            { custom_id: { $regex: search, $options: 'i' } },
           ],
         }
         : {};

@@ -8,6 +8,9 @@ export class CreateAppointmentDto {
   @IsString()
   branch_id: string;
 
+  @IsString()
+  appoitment_reason: string;
+
   @IsDateString()
   start_time: string;
 

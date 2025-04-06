@@ -6,6 +6,9 @@ export type PatientDocument = Patient & Document;
 
 @Schema({ timestamps: true })
 export class Patient {
+  @Prop({ required: true, unique: true })
+  custom_id: string;
+
   @Prop({ required: true })
   name: string;
 
@@ -15,12 +18,11 @@ export class Patient {
   @Prop()
   address: string;
 
-  @Prop({ required: true })
-  phone_no: string;
+  @Prop({ required: true, unique: true })
+  phone_no: string; // Phone number - must be unique
 
   @Prop()
   email?: string;
-
 }
 
 export const PatientSchema = SchemaFactory.createForClass(Patient);

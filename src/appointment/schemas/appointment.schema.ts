@@ -16,6 +16,9 @@ export class Appointment {
   start_time: Date;
 
   @Prop({ required: true })
+  appoitment_reason: Date;
+
+  @Prop({ required: true })
   end_time: Date;
 
   @Prop({ enum: ['UPCOMING', 'COMPLETED', 'CANCELLED'], default: 'UPCOMING' })

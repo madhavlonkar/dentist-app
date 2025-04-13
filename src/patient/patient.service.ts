@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Logger,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -18,7 +19,7 @@ export class PatientService {
   constructor(
     @InjectModel(Patient.name)
     private readonly patientModel: Model<PatientDocument>,
-  ) {}
+  ) { }
 
   /**
    * Create a new patient
@@ -26,15 +27,27 @@ export class PatientService {
   async create(createPatientDto: CreatePatientDto): Promise<any> {
     this.logger.log('Creating a new patient');
     try {
+      // Check if custom_id is present and already exists
+      if (createPatientDto.custom_id) {
+        const existingPatient = await this.patientModel.findOne({ custom_id: createPatientDto.custom_id });
+        if (existingPatient) {
+          this.logger.warn(`Patient with custom_id ${createPatientDto.custom_id} already exists`);
+          throw new BadRequestException(`Patient with custom_id ${createPatientDto.custom_id} already exists`);
+        }
+      }
+
       const patient = new this.patientModel(createPatientDto);
       const result = await patient.save();
+
       this.logger.log(`Patient created successfully with ID: ${result._id}`);
       return {
-        statusCode: 201,
         message: 'Patient added successfully',
       };
     } catch (error) {
       this.logger.error('Error creating patient', error.stack);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new InternalServerErrorException('Failed to add patient in the system');
     }
   }
@@ -48,12 +61,12 @@ export class PatientService {
       // Build dynamic search filter
       const filter = search
         ? {
-            $or: [
-              { name: { $regex: search, $options: 'i' } },
-              { phone_no: { $regex: search, $options: 'i' } },
-              { custom_id: { $regex: search, $options: 'i' } },
-            ],
-          }
+          $or: [
+            { name: { $regex: search, $options: 'i' } },
+            { phone_no: { $regex: search, $options: 'i' } },
+            { custom_id: { $regex: search, $options: 'i' } },
+          ],
+        }
         : {};
 
       const patients = await this.patientModel.find(filter).exec();
@@ -72,17 +85,17 @@ export class PatientService {
   /**
    * Get a single patient by ID
    */
-  async findOne(id: string): Promise<any> {
-    this.logger.log(`Fetching patient with ID: ${id}`);
+  async findOne(customId: string): Promise<any> {
+    this.logger.log(`Fetching patient with custom_id: ${customId}`);
     try {
-      const patient = await this.patientModel.findById(id).exec();
+      const patient = await this.patientModel.findOne({ custom_id: customId }).exec();
 
       if (!patient) {
-        this.logger.warn(`Patient with ID: ${id} not found`);
-        throw new NotFoundException(`Patient #${id} not found`);
+        this.logger.warn(`Patient with custom_id: ${customId} not found`);
+        throw new NotFoundException(`Patient with custom_id ${customId} not found`);
       }
 
-      this.logger.log(`Patient with ID: ${id} fetched successfully`);
+      this.logger.log(`Patient with custom_id: ${customId} fetched successfully`);
       return {
         statusCode: 200,
         message: 'Patient fetched successfully',
@@ -92,30 +105,31 @@ export class PatientService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error(`Error fetching patient with ID: ${id}`, error.stack);
+      this.logger.error(`Error fetching patient with custom_id: ${customId}`, error.stack);
       throw new InternalServerErrorException('Failed to fetch patient');
     }
   }
+
 
   /**
    * Update a patient by ID
    */
   async update(
-    id: string,
+    customId: string,
     updatePatientDto: UpdatePatientDto,
   ): Promise<any> {
-    this.logger.log(`Updating patient with ID: ${id}`);
+    this.logger.log(`Updating patient with custom_id: ${customId}`);
     try {
       const updatedPatient = await this.patientModel
-        .findByIdAndUpdate(id, updatePatientDto, { new: true })
+        .findOneAndUpdate({ custom_id: customId }, updatePatientDto, { new: true })
         .exec();
 
       if (!updatedPatient) {
-        this.logger.warn(`Patient with ID: ${id} not found for update`);
-        throw new NotFoundException(`Patient #${id} not found`);
+        this.logger.warn(`Patient with custom_id: ${customId} not found for update`);
+        throw new NotFoundException(`Patient with custom_id ${customId} not found`);
       }
 
-      this.logger.log(`Patient with ID: ${id} updated successfully`);
+      this.logger.log(`Patient with custom_id: ${customId} updated successfully`);
       return {
         statusCode: 200,
         message: 'Patient updated successfully',
@@ -124,8 +138,9 @@ export class PatientService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error(`Error updating patient with ID: ${id}`, error.stack);
+      this.logger.error(`Error updating patient with custom_id: ${customId}`, error.stack);
       throw new InternalServerErrorException('Failed to update patient');
     }
   }
+
 }
